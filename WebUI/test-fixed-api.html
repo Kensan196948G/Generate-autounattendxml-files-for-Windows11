@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API修正確認テスト</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #0078d4;
+            padding-bottom: 10px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+        .endpoint {
+            font-family: 'Courier New', monospace;
+            background: #e8e8e8;
+            padding: 5px 10px;
+            border-radius: 3px;
+            display: inline-block;
+            margin: 5px 0;
+        }
+        button {
+            padding: 12px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 10px 10px 0;
+            transition: all 0.3s;
+        }
+        .test-btn {
+            background: #0078d4;
+            color: white;
+        }
+        .test-btn:hover {
+            background: #005a9e;
+        }
+        .download-btn {
+            background: #107c10;
+            color: white;
+        }
+        .download-btn:hover {
+            background: #0e5f0e;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .status-200 { color: #28a745; font-weight: bold; }
+        .status-404 { color: #dc3545; font-weight: bold; }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 API エンドポイント修正確認</h1>
+        
+        <div class="test-section">
+            <h2>❌ 間違ったエンドポイント（修正前）</h2>
+            <div class="endpoint">http://192.168.3.92:8081/api/api/generate-unattend</div>
+            <br>
+            <button class="test-btn" onclick="testWrongEndpoint()">テスト実行</button>
+            <div id="wrong-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>✅ 正しいエンドポイント（修正後）</h2>
+            <div class="endpoint">http://192.168.3.92:8081/api/generate-unattend</div>
+            <br>
+            <button class="test-btn" onclick="testCorrectEndpoint()">テスト実行</button>
+            <button class="download-btn" onclick="downloadXML()">XMLダウンロード</button>
+            <div id="correct-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 修正の効果</h2>
+            <p>フロントエンドは修正により、正しいエンドポイントを使用するようになりました：</p>
+            <ul>
+                <li><strong>修正前:</strong> <code>/api/api/generate-unattend</code> → <span class="status-404">404 Not Found</span></li>
+                <li><strong>修正後:</strong> <code>/api/generate-unattend</code> → <span class="status-200">200 OK</span></li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        async function testWrongEndpoint() {
+            const resultDiv = document.getElementById('wrong-result');
+            resultDiv.innerHTML = '<p>テスト中...</p>';
+            
+            try {
+                const response = await fetch('http://192.168.3.92:8081/api/api/generate-unattend', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+                
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        <strong>予想通り失敗（正常な動作）</strong><br>
+                        ステータス: <span class="status-404">${response.status} ${response.statusText}</span><br>
+                        説明: このパスは存在しないため、404エラーが返されます。
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        <strong>ネットワークエラー</strong><br>
+                        ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        async function testCorrectEndpoint() {
+            const resultDiv = document.getElementById('correct-result');
+            resultDiv.innerHTML = '<p>テスト中...</p>';
+            
+            try {
+                const response = await fetch('http://192.168.3.92:8081/api/generate-unattend', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+                
+                if (response.ok) {
+                    const contentType = response.headers.get('content-type');
+                    const contentLength = response.headers.get('content-length');
+                    
+                    resultDiv.innerHTML = `
+                        <div class="result success">
+                            <strong>✅ 成功！</strong><br>
+                            ステータス: <span class="status-200">${response.status} OK</span><br>
+                            Content-Type: ${contentType}<br>
+                            サイズ: ${contentLength} bytes<br>
+                            説明: XML生成エンドポイントが正常に動作しています。
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="result error">
+                            <strong>エラー</strong><br>
+                            ステータス: ${response.status} ${response.statusText}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        <strong>ネットワークエラー</strong><br>
+                        ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        async function downloadXML() {
+            try {
+                const response = await fetch('http://192.168.3.92:8081/api/generate-unattend', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        local_accounts: [{
+                            name: "test-user",
+                            password: "TestPass123!",
+                            description: "テストユーザー",
+                            display_name: "Test User",
+                            group: "Administrators"
+                        }]
+                    })
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'autounattend.xml';
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    window.URL.revokeObjectURL(url);
+                    
+                    document.getElementById('correct-result').innerHTML = `
+                        <div class="result success">
+                            <strong>✅ ダウンロード開始！</strong><br>
+                            ファイル名: autounattend.xml
+                        </div>
+                    `;
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                document.getElementById('correct-result').innerHTML = `
+                    <div class="result error">
+                        <strong>ダウンロードエラー</strong><br>
+                        ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // ページ読み込み時に自動テスト
+        window.onload = function() {
+            console.log('API修正確認テストページ読み込み完了');
+        };
+    </script>
+</body>
+</html>

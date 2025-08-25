@@ -129,3 +129,43 @@ temp/
 # Configuration files with sensitive data
 configs/secrets.yaml
 configs/private.yaml
+
+# --- Node/Next.js (frontend) ---
+/WebUI/frontend/node_modules/
+/WebUI/frontend/.next/
+/WebUI/frontend/out/
+/WebUI/frontend/.turbo/
+/WebUI/frontend/.cache/
+/WebUI/frontend/.vercel/
+
+# --- Python (backend) ---
+/WebUI/backend/.venv/
+/WebUI/backend/__pycache__/
+/WebUI/backend/.pytest_cache/
+/WebUI/backend/.mypy_cache/
+/WebUI/backend/.ruff_cache
+__pycache__/
+*.pyc
+
+# --- Build/Artifacts ---
+/outputs/
+/test-outputs/
+*.zip
+*.log
+*.bak
+*.tmp
+*.swp
+serena_setup_log.txt
+
+# --- Playwright/coverage ---
+/WebUI/playwright/.cache
+coverage/
+
+# --- IDE/OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- 危険ファイル名（Windows予約名対策）---
+/nul

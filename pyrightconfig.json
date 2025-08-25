@@ -1,0 +1,14 @@
+{
+    "include": ["src", "tests"],
+    "exclude": ["**/__pycache__", "**/.venv", "**/venv", "**/node_modules", "WebUI/backend/venv"],
+    "venvPath": ".",
+    "venv": ".venv",
+    "pythonVersion": "3.13",
+    "pythonPlatform": "Windows",
+    "reportMissingImports": "warning",
+    "reportMissingTypeStubs": "none",
+    "reportGeneralTypeIssues": "warning",
+    "reportOptionalMemberAccess": "warning",
+    "reportAttributeAccessIssue": "warning",
+    "stubPath": "./typings"
+}

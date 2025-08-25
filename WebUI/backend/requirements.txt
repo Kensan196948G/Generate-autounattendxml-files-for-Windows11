@@ -1,0 +1,31 @@
+# Windows 11 Sysprep応答ファイル自動生成システム WebUI版
+# バックエンド依存ライブラリ - Python 3.13対応版
+
+# FastAPI関連（最新安定版）
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+python-multipart==0.0.9
+
+# WebSocket通信
+websockets>=15.0.0
+
+# XML処理（オプション）
+# lxml>=4.9.0
+
+# 設定管理（既存pydanticを使用）
+# pydantic>=2.11.0
+
+# YAMLサポート（既存PyYAMLを使用）
+# PyYAML>=6.0.0
+
+# 非同期処理
+aiofiles>=24.0.0
+
+# パフォーマンス監視（オプション）
+# psutil>=5.9.0
+
+# 開発支援（オプション）
+# python-dotenv>=1.0.0
+
+# Windows環境対応（条件付き）
+# pywin32==306; sys_platform == "win32"

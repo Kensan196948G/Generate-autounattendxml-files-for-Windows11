@@ -1,0 +1,351 @@
+# Windows 11 エンタープライズ向けプリセット設定
+# Enterprise preset configuration for Windows 11 unattended installation
+
+metadata:
+  name: "Enterprise Preset"
+  description: "企業環境向けのWindows 11無人インストール設定"
+  version: "1.0.0"
+  author: "Windows 11 Sysprep応答ファイル生成システム"
+  target_environment: "enterprise"
+  last_updated: "2024-01-01"
+
+# === 基本設定 ===
+general:
+  # コンピューター名（最大15文字、英数字とハイフンのみ）
+  computer_name: "ENT-WIN11-01"
+  
+  # タイムゾーン設定
+  time_zone: "Tokyo Standard Time"
+  
+  # 地域設定
+  locale: "ja-JP"
+  
+  # キーボードレイアウト
+  keyboard_layout: "ja-JP"
+  input_language: "0411:00000411"
+  
+  # システム言語設定
+  system_locale: "ja-JP"
+  user_locale: "ja-JP"
+  
+  # OEM情報設定
+  oem_information:
+    manufacturer: "Your Enterprise"
+    model: "Enterprise Desktop"
+    support_hours: "9:00 - 17:00 (JST)"
+    support_phone: "03-1234-5678"
+    support_url: "https://support.yourcompany.com"
+
+# === ユーザーアカウント設定 ===
+user_accounts:
+  # 管理者アカウント設定
+  administrator:
+    username: "EntAdmin"
+    password: "P@ssw0rd123!"  # 注意: 本番環境では複雑なパスワードを使用
+    full_name: "Enterprise Administrator"
+    description: "企業管理者アカウント"
+    enabled: true
+    auto_logon: false  # セキュリティ上、自動ログオンは無効
+    password_expires: false
+    password_change_required: true  # 初回ログイン時にパスワード変更を要求
+    
+  # ローカルアカウント設定
+  local_accounts:
+    - username: "ServiceAccount"
+      password: "Serv1ce@cc0unt"
+      full_name: "Service Account"
+      description: "サービス実行用アカウント"
+      group: "Users"
+      enabled: true
+      password_expires: false
+      
+    - username: "SupportUser"
+      password: "Supp0rt@User"
+      full_name: "Support User"
+      description: "サポート用ユーザーアカウント"
+      group: "Power Users"
+      enabled: true
+      password_expires: true
+
+# === ネットワーク設定 ===
+network:
+  # ドメイン参加設定
+  domain_join:
+    domain_name: "corp.enterprise.local"
+    username: "DomainJoinUser"
+    password: "D0main@J0in123"
+    ou_path: "OU=Workstations,OU=Computers,DC=corp,DC=enterprise,DC=local"
+    machine_account_ou: "OU=Workstations,OU=Computers,DC=corp,DC=enterprise,DC=local"
+    
+  # 静的IP設定（ドメイン環境で推奨）
+  static_ip:
+    ip_address: "192.168.100.50"
+    subnet_mask: "255.255.255.0"
+    gateway: "192.168.100.1"
+    dns_servers:
+      - "192.168.100.10"  # プライマリDNS（ドメインコントローラー）
+      - "192.168.100.11"  # セカンダリDNS
+    dns_suffix: "corp.enterprise.local"
+    
+  # ファイアウォール設定
+  firewall:
+    domain_profile: true
+    private_profile: true
+    public_profile: true
+    allow_ping: true
+    allow_file_sharing: true
+    allow_remote_desktop: true
+
+# === アプリケーション設定 ===
+applications:
+  # インストールするパッケージ
+  install_packages:
+    - name: "7-Zip"
+      source: "\\\\fileserver\\software\\7z2200-x64.exe"
+      arguments: "/S"
+      description: "アーカイブユーティリティ"
+      
+    - name: "Google Chrome Enterprise"
+      source: "\\\\fileserver\\software\\GoogleChromeStandaloneEnterprise64.msi"
+      arguments: "/quiet /norestart"
+      description: "Webブラウザ"
+      
+    - name: "Microsoft Office 2021"
+      source: "\\\\fileserver\\software\\Office\\setup.exe"
+      arguments: "/configure office_config.xml"
+      description: "オフィススイート"
+      
+    - name: "Adobe Acrobat Reader DC"
+      source: "\\\\fileserver\\software\\AcroRdrDC2200120085_ja_JP.exe"
+      arguments: "/sAll /rs /msi EULA_ACCEPT=YES"
+      description: "PDFリーダー"
+      
+    - name: "Windows Defender for Business"
+      source: "\\\\fileserver\\software\\DefenderForBusiness.msi"
+      arguments: "/quiet"
+      description: "企業向けセキュリティソフト"
+
+  # 実行するコマンド
+  run_commands:
+    - command: "reg add \"HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU\" /v NoAutoUpdate /t REG_DWORD /d 1 /f"
+      description: "Windows Update自動更新を無効化"
+      order: 1
+      
+    - command: "reg add \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\" /v EnableLUA /t REG_DWORD /d 1 /f"
+      description: "User Account Control (UAC)を有効化"
+      order: 2
+      
+    - command: "reg add \"HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows Defender\" /v DisableAntiSpyware /t REG_DWORD /d 0 /f"
+      description: "Windows Defenderを有効化"
+      order: 3
+      
+    - command: "schtasks /create /tn \"EnterpriseBackup\" /tr \"\\\\fileserver\\scripts\\backup.bat\" /sc daily /st 02:00"
+      description: "日次バックアップタスクを作成"
+      order: 4
+      
+    - command: "netsh advfirewall set allprofiles state on"
+      description: "Windows Firewallを有効化"
+      order: 5
+
+# === Windows機能設定 ===
+windows_features:
+  # 有効にする機能
+  enable:
+    - "Microsoft-Windows-Subsystem-Linux"  # WSL
+    - "Microsoft-Hyper-V-All"              # Hyper-V（仮想化）
+    - "Microsoft-Hyper-V-Management-Clients"
+    - "IIS-WebServerRole"                   # IIS Webサーバー
+    - "IIS-HttpCompressionDynamic"
+    - "IIS-HttpCompressionStatic"
+    - "IIS-ManagementConsole"
+    - "TelnetClient"                        # Telnetクライアント
+    - "TFTP"                               # TFTPクライアント
+    - "Microsoft-Windows-NetFx3-OnDemand-Features"  # .NET Framework 3.5
+    - "NetFx4-AdvSrvs"                     # .NET Framework 4詳細サービス
+    - "WCF-Services45"                     # WCF Services
+    - "Microsoft-Windows-Printing-Foundation"       # 印刷サービス
+    - "Printing-PrintToPDFServices-Features"        # PDF印刷
+    - "WorkFolders-Client"                 # Work Folders
+    - "SMB1Protocol"                       # SMB 1.0（レガシー対応）
+    
+  # 無効にする機能
+  disable:
+    - "WindowsMediaPlayer"                 # Windows Media Player
+    - "Internet-Explorer-Optional-amd64"   # Internet Explorer
+    - "MediaPlayback"                      # メディア再生機能
+    - "WindowsGadgetPlatform"             # Windows ガジェット
+    - "FaxServicesClientPackage"          # FAX サービス
+    - "XPS-Foundation-Xps-Viewer"         # XPS Viewer
+
+# === レジストリ設定 ===
+registry:
+  keys:
+    # セキュリティポリシー設定
+    - path: "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\System"
+      name: "DisableAutomaticRestartSignOn"
+      value: "1"
+      type: "REG_DWORD"
+      action: "add"
+      description: "自動再起動後のサインオンを無効化"
+      
+    # プライバシー設定
+    - path: "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection"
+      name: "AllowTelemetry"
+      value: "1"
+      type: "REG_DWORD"
+      action: "add"
+      description: "テレメトリを基本レベルに設定"
+      
+    # Windows Update設定
+    - path: "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate"
+      name: "DeferUpgrade"
+      value: "1"
+      type: "REG_DWORD"
+      action: "add"
+      description: "機能更新プログラムの延期を有効化"
+      
+    # ネットワーク設定
+    - path: "HKLM\\SYSTEM\\CurrentControlSet\\Services\\lanmanserver\\parameters"
+      name: "RequireSecuritySignature"
+      value: "1"
+      type: "REG_DWORD"
+      action: "add"
+      description: "SMB署名を要求"
+      
+    # 企業環境向けパフォーマンス設定
+    - path: "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile"
+      name: "SystemResponsiveness"
+      value: "10"
+      type: "REG_DWORD"
+      action: "add"
+      description: "システムの応答性を向上"
+      
+    # デスクトップ環境設定
+    - path: "HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"
+      name: "Hidden"
+      value: "1"
+      type: "REG_DWORD"
+      action: "add"
+      description: "隠しファイルを表示"
+      
+    - path: "HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"
+      name: "HideFileExt"
+      value: "0"
+      type: "REG_DWORD"
+      action: "add"
+      description: "ファイル拡張子を表示"
+
+# === セキュリティ設定 ===
+security:
+  # パスワードポリシー
+  password_policy:
+    minimum_length: 8
+    complexity_required: true
+    maximum_age: 90
+    minimum_age: 1
+    history_count: 12
+    lockout_threshold: 5
+    lockout_duration: 30
+    
+  # 監査ポリシー
+  audit_policy:
+    logon_events: true
+    account_management: true
+    privilege_use: true
+    system_events: true
+    policy_change: true
+    
+  # User Account Control (UAC)
+  uac:
+    enabled: true
+    admin_approval_mode: true
+    prompt_for_credentials: true
+    
+  # BitLocker設定（企業環境で推奨）
+  bitlocker:
+    enable_startup_key: true
+    require_tpm: true
+    recovery_key_backup: "\\\\fileserver\\bitlocker_keys"
+
+# === システム最適化設定 ===
+optimization:
+  # パフォーマンス設定
+  performance:
+    visual_effects: "best_performance"
+    processor_scheduling: "programs"
+    memory_usage: "programs"
+    virtual_memory: "system_managed"
+    
+  # サービス設定
+  services:
+    disable:
+      - "Fax"
+      - "Windows Search"  # 企業環境では検索機能を制限
+      - "HomeGroupListener"
+      - "HomeGroupProvider"
+    
+    manual:
+      - "Themes"
+      - "TabletInputService"
+      - "TouchKeyboard"
+      
+  # スタートアップ最適化
+  startup:
+    disable_startup_programs: true
+    fast_startup: false  # 企業環境では完全シャットダウンを推奨
+
+# === 監視・ログ設定 ===
+monitoring:
+  # イベントログ設定
+  event_logs:
+    application_max_size: "100MB"
+    system_max_size: "100MB"
+    security_max_size: "200MB"
+    retention: "overwrite_as_needed"
+    
+  # パフォーマンスカウンター
+  performance_counters:
+    collect_cpu_usage: true
+    collect_memory_usage: true
+    collect_disk_usage: true
+    collect_network_usage: true
+    
+  # SNMP設定（企業監視システム用）
+  snmp:
+    enabled: true
+    community_string: "enterprise_monitoring"
+    contact: "it-support@enterprise.local"
+    location: "Tokyo Office"
+
+# === バックアップ・復旧設定 ===
+backup:
+  # システム復元
+  system_restore:
+    enabled: true
+    disk_usage_limit: "10%"
+    restore_point_frequency: "daily"
+    
+  # ファイル履歴
+  file_history:
+    enabled: true
+    backup_location: "\\\\fileserver\\backups\\%COMPUTERNAME%"
+    backup_frequency: "hourly"
+    retention_period: "90_days"
+
+# === コンプライアンス設定 ===
+compliance:
+  # 企業ポリシー準拠
+  corporate_policies:
+    disable_usb_storage: true
+    disable_cd_dvd_autorun: true
+    require_screensaver: true
+    screensaver_timeout: 900  # 15分
+    require_password_on_wake: true
+    
+  # データ保護
+  data_protection:
+    disable_clipboard_sync: true
+    disable_activity_history: true
+    disable_location_services: true
+    disable_camera: false  # ビデオ会議で必要
+    disable_microphone: false

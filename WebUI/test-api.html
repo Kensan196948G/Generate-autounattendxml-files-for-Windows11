@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API接続テスト</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-result {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Windows 11 Sysprep API 接続テスト</h1>
+    
+    <div>
+        <button onclick="testBackendConnection()">バックエンド接続テスト</button>
+        <button onclick="generateXML()">XML生成テスト</button>
+        <button onclick="testCORS()">CORS テスト</button>
+    </div>
+    
+    <div id="results"></div>
+
+    <script>
+        const API_URL = 'http://192.168.3.92:8081';
+        
+        function addResult(title, success, message, details = null) {
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${success ? 'success' : 'error'}`;
+            
+            let html = `<h3>${title}</h3><p>${message}</p>`;
+            if (details) {
+                html += `<pre>${JSON.stringify(details, null, 2)}</pre>`;
+            }
+            resultDiv.innerHTML = html;
+            resultsDiv.insertBefore(resultDiv, resultsDiv.firstChild);
+        }
+        
+        async function testBackendConnection() {
+            try {
+                const response = await fetch(`${API_URL}/api/test`);
+                const data = await response.json();
+                addResult(
+                    'バックエンド接続テスト',
+                    true,
+                    'バックエンドへの接続に成功しました！',
+                    data
+                );
+            } catch (error) {
+                addResult(
+                    'バックエンド接続テスト',
+                    false,
+                    `エラー: ${error.message}`,
+                    { error: error.toString() }
+                );
+            }
+        }
+        
+        async function generateXML() {
+            try {
+                const response = await fetch(`${API_URL}/api/generate-unattend`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        local_accounts: [{
+                            name: "test-user",
+                            password: "TestPassword123!",
+                            description: "Test user",
+                            display_name: "Test User",
+                            group: "Administrators"
+                        }]
+                    })
+                });
+                
+                if (response.ok) {
+                    const xmlText = await response.text();
+                    addResult(
+                        'XML生成テスト',
+                        true,
+                        'XMLの生成に成功しました！',
+                        { 
+                            status: response.status,
+                            contentType: response.headers.get('content-type'),
+                            xmlLength: xmlText.length,
+                            preview: xmlText.substring(0, 500) + '...'
+                        }
+                    );
+                } else {
+                    const error = await response.text();
+                    addResult(
+                        'XML生成テスト',
+                        false,
+                        `サーバーエラー: ${response.status}`,
+                        { error: error }
+                    );
+                }
+            } catch (error) {
+                addResult(
+                    'XML生成テスト',
+                    false,
+                    `ネットワークエラー: ${error.message}`,
+                    { error: error.toString() }
+                );
+            }
+        }
+        
+        async function testCORS() {
+            try {
+                const response = await fetch(`${API_URL}/api/status`, {
+                    method: 'GET',
+                    headers: {
+                        'Origin': window.location.origin
+                    }
+                });
+                const data = await response.json();
+                
+                addResult(
+                    'CORS テスト',
+                    true,
+                    'CORS設定は正常です！',
+                    {
+                        origin: window.location.origin,
+                        allowOrigin: response.headers.get('access-control-allow-origin'),
+                        data: data
+                    }
+                );
+            } catch (error) {
+                addResult(
+                    'CORS テスト',
+                    false,
+                    `CORSエラー: ${error.message}`,
+                    { 
+                        origin: window.location.origin,
+                        error: error.toString() 
+                    }
+                );
+            }
+        }
+        
+        // ページ読み込み時に自動でテスト実行
+        window.onload = function() {
+            console.log('API URL:', API_URL);
+            console.log('Current Origin:', window.location.origin);
+            testBackendConnection();
+        };
+    </script>
+</body>
+</html>

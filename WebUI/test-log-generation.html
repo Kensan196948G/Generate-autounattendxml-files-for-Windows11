@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>設定ログ生成テスト</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #0078d4;
+            padding-bottom: 10px;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+        button {
+            background: #0078d4;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #005a9e;
+        }
+        .success {
+            color: #107c10;
+            background: #dff6dd;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .error {
+            color: #a80000;
+            background: #fde7e9;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .response-box {
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .config-display {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .config-display h3 {
+            margin-top: 0;
+            color: #0078d4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Windows 11 Sysprep 設定ログ生成テスト</h1>
+        
+        <div class="test-section">
+            <h2>テスト設定内容</h2>
+            <div class="config-display">
+                <h3>使用する設定:</h3>
+                <ul>
+                    <li><strong>Windowsエディション:</strong> Windows 11 Pro</li>
+                    <li><strong>言語:</strong> 日本語 (ja-JP)</li>
+                    <li><strong>タイムゾーン:</strong> Tokyo Standard Time</li>
+                    <li><strong>ユーザーアカウント:</strong>
+                        <ul>
+                            <li>ユーザー名: testuser</li>
+                            <li>パスワード: TestPass123!</li>
+                            <li>グループ: Administrators</li>
+                        </ul>
+                    </li>
+                    <li><strong>Wi-Fi設定:</strong>
+                        <ul>
+                            <li>SSID: TestNetwork</li>
+                            <li>パスワード: TestWiFiPassword123</li>
+                            <li>自動接続: 有効</li>
+                        </ul>
+                    </li>
+                    <li><strong>Windows 11要件バイパス:</strong> 有効</li>
+                    <li><strong>Microsoftアカウントバイパス:</strong> 有効</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>エンドポイントテスト</h2>
+            
+            <button onclick="testXmlGeneration()">1. XML生成のみテスト</button>
+            <button onclick="testLogGeneration()">2. XML + ログ生成テスト (ZIP)</button>
+            <button onclick="testDirectLogGeneration()">3. ログ内容確認 (デバッグ)</button>
+            
+            <div id="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>レスポンス詳細</h2>
+            <div id="response" class="response-box">テスト結果がここに表示されます...</div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://192.168.3.92:8081/api';
+        
+        // テスト用の設定データ
+        const testConfig = {
+            language: 'ja-JP',
+            architecture: 'amd64',
+            timezone: 'Tokyo Standard Time',
+            windows_edition: 'Pro',
+            product_key: 'VK7JG-NPHTM-C97JM-9MPGT-3V66T',
+            computer_name: 'WIN11-TEST',
+            
+            local_accounts: [{
+                name: 'testuser',
+                password: 'TestPass123!',
+                display_name: 'Test User',
+                group: 'Administrators',
+                description: 'テスト管理者アカウント'
+            }],
+            
+            wifi_settings: {
+                ssid: 'TestNetwork',
+                password: 'TestWiFiPassword123',
+                auth_type: 'WPA2PSK',
+                connect_automatically: true
+            },
+            
+            bypass_win11_requirements: true,
+            bypass_microsoft_account: true,
+            bypass_network_check: true,
+            skip_privacy: true,
+            
+            enable_dotnet35: true,
+            enable_hyperv: false,
+            enable_wsl: false,
+            enable_sandbox: false,
+            
+            desktop_icons: {
+                computer: true,
+                network: true,
+                recycle_bin: true,
+                user_files: true
+            }
+        };
+
+        async function testXmlGeneration() {
+            const resultDiv = document.getElementById('result');
+            const responseDiv = document.getElementById('response');
+            
+            resultDiv.innerHTML = '<div class="info">📋 XML生成をテスト中...</div>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/generate-unattend`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testConfig)
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const text = await blob.text();
+                    
+                    resultDiv.innerHTML = '<div class="success">✅ XML生成成功！</div>';
+                    responseDiv.textContent = text;
+                    
+                    // ダウンロードリンクを作成
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'autounattend.xml';
+                    a.textContent = 'XMLファイルをダウンロード';
+                    a.style.display = 'inline-block';
+                    a.style.marginTop = '10px';
+                    resultDiv.appendChild(a);
+                } else {
+                    const error = await response.text();
+                    resultDiv.innerHTML = `<div class="error">❌ エラー: ${response.status}</div>`;
+                    responseDiv.textContent = error;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ ネットワークエラー: ${error.message}</div>`;
+                responseDiv.textContent = error.stack;
+            }
+        }
+
+        async function testLogGeneration() {
+            const resultDiv = document.getElementById('result');
+            const responseDiv = document.getElementById('response');
+            
+            resultDiv.innerHTML = '<div class="info">📦 XML + ログ生成をテスト中...</div>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/generate-with-log`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testConfig)
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    
+                    resultDiv.innerHTML = '<div class="success">✅ ZIP生成成功！</div>';
+                    responseDiv.textContent = `ZIPファイルサイズ: ${blob.size} bytes\nContent-Type: ${blob.type}`;
+                    
+                    // ダウンロードリンクを作成
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'unattend_package.zip';
+                    a.textContent = 'ZIPファイルをダウンロード (XML + ログ)';
+                    a.style.display = 'inline-block';
+                    a.style.marginTop = '10px';
+                    resultDiv.appendChild(a);
+                } else {
+                    const error = await response.text();
+                    resultDiv.innerHTML = `<div class="error">❌ エラー: ${response.status}</div>`;
+                    responseDiv.textContent = error;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ ネットワークエラー: ${error.message}</div>`;
+                responseDiv.textContent = error.stack;
+            }
+        }
+
+        async function testDirectLogGeneration() {
+            const resultDiv = document.getElementById('result');
+            const responseDiv = document.getElementById('response');
+            
+            resultDiv.innerHTML = '<div class="info">📝 ログ内容を生成中...</div>';
+            
+            try {
+                // バックエンドに直接リクエストしてログ内容を確認
+                const response = await fetch(`${API_BASE}/test-log-content`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testConfig)
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = '<div class="success">✅ ログ生成成功！</div>';
+                    responseDiv.textContent = data.log_content || 'ログ内容が取得できませんでした';
+                } else {
+                    // エンドポイントが存在しない場合は、ローカルでログ内容を模擬
+                    resultDiv.innerHTML = '<div class="info">ℹ️ デバッグエンドポイントは未実装です。ZIP内のログファイルを確認してください。</div>';
+                    responseDiv.textContent = '設定ログはZIPファイル内の「設定ログ.txt」で確認できます。';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ エラー: ${error.message}</div>`;
+                responseDiv.textContent = 'デバッグエンドポイントは実装されていません。ZIP形式でのダウンロードをお試しください。';
+            }
+        }
+
+        // ページ読み込み時に設定内容を表示
+        window.onload = function() {
+            console.log('Test configuration:', testConfig);
+        };
+    </script>
+</body>
+</html>

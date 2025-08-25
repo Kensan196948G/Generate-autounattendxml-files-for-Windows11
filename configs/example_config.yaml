@@ -1,0 +1,368 @@
+# Windows 11 Sysprep応答ファイル生成システム - サンプル設定ファイル
+# Sample configuration file for Windows 11 unattended installation
+
+# このファイルは設定例を示すサンプルファイルです。
+# 実際の環境に合わせて値を変更してご利用ください。
+
+# === メタデータ ===
+# プリセット情報（オプション）
+metadata:
+  name: "Sample Configuration"
+  description: "Windows 11無人インストールのサンプル設定"
+  version: "1.0.0"
+  author: "Sample User"
+  target_environment: "development"
+  created_date: "2024-01-01"
+  notes: "開発環境向けのサンプル設定です"
+
+# === 基本設定 ===
+general:
+  # コンピューター名（1-15文字、英数字とハイフンのみ）
+  computer_name: "DEV-WIN11-01"
+  
+  # タイムゾーン設定
+  # 日本標準時間の場合: "Tokyo Standard Time"
+  # UTC の場合: "UTC"
+  time_zone: "Tokyo Standard Time"
+  
+  # 地域・言語設定
+  locale: "ja-JP"              # システムロケール
+  system_locale: "ja-JP"       # システム言語
+  user_locale: "ja-JP"         # ユーザー言語
+  
+  # キーボード設定
+  keyboard_layout: "ja-JP"     # キーボードレイアウト
+  input_language: "0411:00000411"  # 入力言語ID
+  
+  # OEM情報設定（オプション）
+  oem_information:
+    manufacturer: "Sample Company"
+    model: "Development Workstation"
+    support_hours: "9:00 - 18:00 (JST)"
+    support_phone: "03-1234-5678"
+    support_url: "https://support.samplecompany.com"
+    logo_path: "C:\\Windows\\System32\\oemlogo.bmp"
+
+# === ユーザーアカウント設定 ===
+user_accounts:
+  # 管理者アカウント設定
+  administrator:
+    username: "DevAdmin"              # ユーザー名
+    password: "DevP@ssw0rd123!"       # パスワード（注意: 強固なパスワードを使用）
+    full_name: "Development Administrator"  # フルネーム
+    description: "開発環境管理者アカウント"      # 説明
+    enabled: true                     # アカウント有効化
+    auto_logon: false                 # 自動ログオン（セキュリティ上false推奨）
+    password_expires: false           # パスワード期限
+    password_change_required: false   # 初回ログイン時のパスワード変更要求
+    home_directory: "C:\\Users\\DevAdmin"  # ホームディレクトリ
+    
+  # 追加のローカルアカウント（複数設定可能）
+  local_accounts:
+    # 開発者アカウント
+    - username: "Developer"
+      password: "Dev@123456"
+      full_name: "Development User"
+      description: "開発作業用ユーザーアカウント"
+      group: "Users"                  # 所属グループ: "Users", "Power Users", "Administrators"
+      enabled: true
+      password_expires: true
+      home_directory: "C:\\Users\\Developer"
+      
+    # テストアカウント
+    - username: "TestUser"
+      password: "Test@123456"
+      full_name: "Test User"
+      description: "テスト用ユーザーアカウント"
+      group: "Users"
+      enabled: true
+      password_expires: false
+
+# === ネットワーク設定 ===
+network:
+  # 静的IP設定（オプション: DHCPを使用する場合はこのセクションを削除）
+  static_ip:
+    ip_address: "192.168.1.100"      # IPアドレス
+    subnet_mask: "255.255.255.0"     # サブネットマスク
+    gateway: "192.168.1.1"           # デフォルトゲートウェイ
+    dns_servers:                     # DNSサーバー（複数指定可能）
+      - "8.8.8.8"                    # Google Public DNS
+      - "8.8.4.4"                    # Google Public DNS (セカンダリ)
+      - "192.168.1.1"                # ローカルDNS
+    dns_suffix: "local.dev"          # DNSサフィックス
+    
+  # ドメイン参加設定（ワークグループ設定と排他的）
+  domain_join:
+    domain_name: "dev.local"                    # ドメイン名
+    username: "DomainJoinAccount"               # ドメイン参加用アカウント
+    password: "D0main@J0in123"                  # パスワード
+    ou_path: "OU=Workstations,DC=dev,DC=local"  # 組織単位パス
+    machine_account_ou: "OU=Computers,DC=dev,DC=local"  # コンピューターアカウントOU
+    
+  # ワークグループ設定（ドメイン参加設定と排他的）
+  # workgroup:
+  #   workgroup_name: "DEVELOPMENT"     # ワークグループ名
+    
+  # ファイアウォール設定
+  firewall:
+    domain_profile: true              # ドメインプロファイル
+    private_profile: true             # プライベートプロファイル
+    public_profile: true              # パブリックプロファイル
+    allow_ping: true                  # Ping応答を許可
+    allow_file_sharing: true          # ファイル共有を許可
+    allow_remote_desktop: true        # リモートデスクトップを許可
+
+# === アプリケーション設定 ===
+applications:
+  # インストールするソフトウェア
+  install_packages:
+    # Visual Studio Code
+    - name: "Visual Studio Code"
+      source: "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64"
+      arguments: "/VERYSILENT /SUPPRESSMSGBOXES /MERGETASKS=!runcode"
+      description: "コードエディター"
+      condition: "exists('C:\\Program Files\\Microsoft VS Code')"
+      
+    # Google Chrome
+    - name: "Google Chrome"
+      source: "\\\\fileserver\\software\\ChromeStandaloneSetup64.exe"
+      arguments: "/silent /install"
+      description: "Webブラウザー"
+      
+    # Git for Windows
+    - name: "Git for Windows"
+      source: "https://github.com/git-for-windows/git/releases/latest/download/Git-2.43.0-64-bit.exe"
+      arguments: "/VERYSILENT /NORESTART"
+      description: "バージョン管理システム"
+      
+    # Node.js
+    - name: "Node.js LTS"
+      source: "https://nodejs.org/dist/v20.10.0/node-v20.10.0-x64.msi"
+      arguments: "/quiet /norestart"
+      description: "JavaScript実行環境"
+
+  # セットアップ完了後に実行するコマンド
+  run_commands:
+    # Windows Update無効化（開発環境用）
+    - command: "reg add \"HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU\" /v NoAutoUpdate /t REG_DWORD /d 1 /f"
+      description: "Windows Update自動更新を無効化（開発環境用）"
+      order: 1
+      
+    # 開発者モード有効化
+    - command: "reg add \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\AppModelUnlock\" /v AllowDevelopmentWithoutDevLicense /t REG_DWORD /d 1 /f"
+      description: "開発者モードを有効化"
+      order: 2
+      
+    # PowerShell実行ポリシー設定
+    - command: "powershell -Command \"Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Force\""
+      description: "PowerShell実行ポリシーをRemoteSignedに設定"
+      order: 3
+      
+    # Windows Defender除外設定（開発フォルダー）
+    - command: "powershell -Command \"Add-MpPreference -ExclusionPath 'C:\\Development'\""
+      description: "開発フォルダーをWindows Defenderの除外に追加"
+      order: 4
+      
+    # 開発用フォルダー作成
+    - command: "mkdir C:\\Development\\Projects"
+      description: "開発用フォルダーを作成"
+      order: 5
+
+# === Windows機能設定 ===
+windows_features:
+  # 有効にする機能
+  enable:
+    - "Microsoft-Windows-Subsystem-Linux"          # Windows Subsystem for Linux (WSL)
+    - "VirtualMachinePlatform"                      # 仮想マシンプラットフォーム
+    - "Microsoft-Hyper-V-All"                      # Hyper-V（仮想化機能）
+    - "Microsoft-Hyper-V-Management-Clients"       # Hyper-V管理ツール
+    - "IIS-WebServerRole"                          # IIS Webサーバー
+    - "IIS-HttpCompressionDynamic"                 # HTTP圧縮（動的）
+    - "IIS-HttpCompressionStatic"                  # HTTP圧縮（静的）
+    - "IIS-ManagementConsole"                      # IIS管理コンソール
+    - "IIS-ASPNET45"                               # ASP.NET 4.5
+    - "NetFx4-AdvSrvs"                             # .NET Framework 4詳細サービス
+    - "WCF-Services45"                             # WCF Services
+    - "TelnetClient"                               # Telnetクライアント
+    - "Microsoft-Windows-NetFx3-OnDemand-Features" # .NET Framework 3.5
+    - "Containers"                                 # Containers機能
+    
+  # 無効にする機能（不要な機能を削除してスペース節約）
+  disable:
+    - "WindowsMediaPlayer"                         # Windows Media Player
+    - "Internet-Explorer-Optional-amd64"           # Internet Explorer
+    - "MediaPlayback"                              # メディア再生機能
+    - "XPS-Foundation-Xps-Viewer"                  # XPS Viewer
+    - "Printing-XPSServices-Features"             # XPS印刷サービス
+    - "FaxServicesClientPackage"                   # FAXサービス
+
+# === レジストリ設定 ===
+registry:
+  keys:
+    # エクスプローラー設定
+    - path: "HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"
+      name: "Hidden"
+      value: "1"
+      type: "REG_DWORD"
+      action: "add"
+      description: "隠しファイルを表示"
+      
+    - path: "HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"
+      name: "HideFileExt"
+      value: "0"
+      type: "REG_DWORD"
+      action: "add"
+      description: "ファイル拡張子を表示"
+      
+    - path: "HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"
+      name: "ShowSuperHidden"
+      value: "1"
+      type: "REG_DWORD"
+      action: "add"
+      description: "システム保護されたファイルを表示"
+      
+    # 開発者向け設定
+    - path: "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\AppModelUnlock"
+      name: "AllowDevelopmentWithoutDevLicense"
+      value: "1"
+      type: "REG_DWORD"
+      action: "add"
+      description: "開発者モードを有効化"
+      
+    - path: "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\AppModelUnlock"
+      name: "AllowAllTrustedApps"
+      value: "1"
+      type: "REG_DWORD"
+      action: "add"
+      description: "すべての信頼されたアプリを許可"
+      
+    # パフォーマンス設定
+    - path: "HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects"
+      name: "VisualFXSetting"
+      value: "3"
+      type: "REG_DWORD"
+      action: "add"
+      description: "視覚効果をカスタムに設定"
+      
+    # セキュリティ設定
+    - path: "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System"
+      name: "EnableLUA"
+      value: "1"
+      type: "REG_DWORD"
+      action: "add"
+      description: "User Account Control (UAC)を有効化"
+
+# === セキュリティ設定 ===
+security:
+  # パスワードポリシー
+  password_policy:
+    minimum_length: 8                # 最小文字数
+    complexity_required: true        # 複雑さ要求
+    maximum_age: 90                  # 最大有効期間（日）
+    minimum_age: 1                   # 最小有効期間（日）
+    history_count: 5                 # 履歴記録数
+    lockout_threshold: 5             # アカウントロックアウト閾値
+    lockout_duration: 30             # ロックアウト時間（分）
+    
+  # 監査ポリシー
+  audit_policy:
+    logon_events: true               # ログオンイベント
+    account_management: true         # アカウント管理
+    privilege_use: true              # 特権使用
+    system_events: true              # システムイベント
+    policy_change: true              # ポリシー変更
+    
+  # User Account Control (UAC)
+  uac:
+    enabled: true                    # UAC有効化
+    admin_approval_mode: true        # 管理者承認モード
+    prompt_for_credentials: true     # 資格情報の要求
+    
+  # Windows Defender設定
+  windows_defender:
+    real_time_protection: true       # リアルタイム保護
+    cloud_protection: true           # クラウド保護
+    sample_submission: true          # サンプル送信
+    exclusions:                      # 除外設定
+      - "C:\\Development"            # 開発フォルダー
+      - "C:\\temp"                   # 一時フォルダー
+
+# === システム最適化設定 ===
+optimization:
+  # パフォーマンス設定
+  performance:
+    visual_effects: "custom"         # 視覚効果: "best_appearance", "best_performance", "custom"
+    processor_scheduling: "programs" # プロセッサスケジューリング: "programs", "background_services"
+    memory_usage: "programs"         # メモリ使用: "programs", "system_cache"
+    virtual_memory: "custom"         # 仮想メモリ: "system_managed", "custom"
+    virtual_memory_size: 4096        # 仮想メモリサイズ（MB）
+    
+  # サービス設定
+  services:
+    # 無効化するサービス
+    disable:
+      - "Fax"                        # FAX
+      - "HomeGroupListener"          # HomeGroup Listener
+      - "HomeGroupProvider"          # HomeGroup Provider
+      - "dmwappushservice"           # WAP Push Message Routing Service
+      - "MapsBroker"                 # Downloaded Maps Manager
+      
+    # 手動起動に変更するサービス
+    manual:
+      - "Themes"                     # テーマサービス
+      - "TabletInputService"         # Tablet PC Input Service
+      - "TouchKeyboard"              # Touch Keyboard and Handwriting Panel Service
+      
+  # スタートアップ最適化
+  startup:
+    disable_startup_programs: true   # スタートアッププログラム無効化
+    fast_startup: true               # 高速スタートアップ
+
+# === 監視・ログ設定 ===
+monitoring:
+  # イベントログ設定
+  event_logs:
+    application_max_size: "50MB"     # アプリケーションログ最大サイズ
+    system_max_size: "50MB"          # システムログ最大サイズ
+    security_max_size: "100MB"       # セキュリティログ最大サイズ
+    retention: "overwrite_as_needed" # 保持方法: "overwrite_as_needed", "archive", "never_overwrite"
+    
+  # パフォーマンスカウンター
+  performance_counters:
+    collect_cpu_usage: true          # CPU使用率収集
+    collect_memory_usage: true       # メモリ使用率収集
+    collect_disk_usage: true         # ディスク使用率収集
+    collect_network_usage: true      # ネットワーク使用率収集
+
+# === バックアップ・復旧設定 ===
+backup:
+  # システム復元
+  system_restore:
+    enabled: true                    # システム復元有効化
+    disk_usage_limit: "5%"           # ディスク使用量制限
+    restore_point_frequency: "daily" # 復元ポイント作成頻度
+    
+  # ファイル履歴（オプション）
+  file_history:
+    enabled: false                   # ファイル履歴有効化
+    backup_location: "D:\\FileHistory" # バックアップ場所
+    backup_frequency: "hourly"       # バックアップ頻度
+    retention_period: "30_days"      # 保持期間
+
+# === 注意事項とコメント ===
+# 1. パスワードは必ず強固なものに変更してください
+# 2. 本番環境では自動ログオンは無効にしてください  
+# 3. ネットワーク設定は環境に合わせて調整してください
+# 4. 不要な機能は無効にしてセキュリティとパフォーマンスを向上させてください
+# 5. 定期的に設定を見直し、セキュリティアップデートを適用してください
+
+# === 使用例 ===
+# このファイルを使用してunattend.xmlを生成するコマンド:
+# python generate_unattend.py generate --config configs/example_config.yaml
+
+# インタラクティブモードでの設定:
+# python generate_unattend.py generate --interactive
+
+# プリセットの使用:
+# python generate_unattend.py generate --preset minimal
+# python generate_unattend.py generate --preset enterprise

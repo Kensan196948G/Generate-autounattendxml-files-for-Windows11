@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="utf-8"?>
+<unattend xmlns="urn:schemas-microsoft-com:unattend">
+    <settings pass_="windowsPE">
+        <component name="Microsoft-Windows-International-Core-WinPE" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <SetupUILanguage>
+                <UILanguage>ja-JP</UILanguage>
+            </SetupUILanguage>
+            <InputLocale>0411:00000411</InputLocale>
+            <SystemLocale>ja-JP</SystemLocale>
+            <UILanguage>ja-JP</UILanguage>
+            <UserLocale>ja-JP</UserLocale>
+        </component>
+        <component name="Microsoft-Windows-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <UserData>
+                <ProductKey>
+                    <Key>VK7JG-NPHTM-C97JM-9MPGT-3V66T</Key>
+                </ProductKey>
+                <AcceptEula>true</AcceptEula>
+            </UserData>
+            <RunSynchronous>
+                <RunSynchronousCommand>
+                    <Order>1</Order>
+                    <Path>reg add HKLM\SYSTEM\Setup\LabConfig /v BypassTPMCheck /t REG_DWORD /d 1 /f</Path>
+                </RunSynchronousCommand>
+                <RunSynchronousCommand>
+                    <Order>2</Order>
+                    <Path>reg add HKLM\SYSTEM\Setup\LabConfig /v BypassSecureBootCheck /t REG_DWORD /d 1 /f</Path>
+                </RunSynchronousCommand>
+                <RunSynchronousCommand>
+                    <Order>3</Order>
+                    <Path>reg add HKLM\SYSTEM\Setup\LabConfig /v BypassCPUCheck /t REG_DWORD /d 1 /f</Path>
+                </RunSynchronousCommand>
+                <RunSynchronousCommand>
+                    <Order>4</Order>
+                    <Path>reg add HKLM\SYSTEM\Setup\LabConfig /v BypassRAMCheck /t REG_DWORD /d 1 /f</Path>
+                </RunSynchronousCommand>
+            </RunSynchronous>
+        </component>
+        <component name="Microsoft-Windows-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <EnableFirewall>false</EnableFirewall>
+            <EnableNetwork>true</EnableNetwork>
+        </component>
+        <component name="Microsoft-Windows-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <DiskConfiguration>
+                <Disk>
+                    <DiskID>0</DiskID>
+                    <WillWipeDisk>true</WillWipeDisk>
+                    <CreatePartitions>
+                        <CreatePartition>
+                            <Order>1</Order>
+                            <Type>EFI</Type>
+                            <Size>100</Size>
+                        </CreatePartition>
+                        <CreatePartition>
+                            <Order>2</Order>
+                            <Type>MSR</Type>
+                            <Size>16</Size>
+                        </CreatePartition>
+                        <CreatePartition>
+                            <Order>3</Order>
+                            <Type>Primary</Type>
+                            <Extend>true</Extend>
+                        </CreatePartition>
+                        <CreatePartition>
+                            <Order>4</Order>
+                        </CreatePartition>
+                    </CreatePartitions>
+                </Disk>
+            </DiskConfiguration>
+        </component>
+    </settings>
+    <settings pass_="specialize">
+        <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <ComputerName>TEST-PC-001</ComputerName>
+            <TimeZone>Tokyo Standard Time</TimeZone>
+            <ProductKey>VK7JG-NPHTM-C97JM-9MPGT-3V66T</ProductKey>
+        </component>
+        <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS"/>
+        <component name="Microsoft-Windows-ServerManager-SvrMgrNc" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS"/>
+        <component name="Microsoft-Windows-WiFi-ConfigSP" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <WiFiProfiles>
+                <WiFiProfile>
+                    <ProfileName>TestNetwork2024</ProfileName>
+                    <SSIDConfig>
+                        <SSID>
+                            <name>TestNetwork2024</name>
+                        </SSID>
+                    </SSIDConfig>
+                    <ConnectionType>ESS</ConnectionType>
+                    <ConnectionMode>auto</ConnectionMode>
+                    <MSM>
+                        <security>
+                            <authEncryption>
+                                <authentication>WPA2PSK</authentication>
+                                <encryption>AES</encryption>
+                            </authEncryption>
+                            <sharedKey>
+                                <keyType>passPhrase</keyType>
+                                <protected>false</protected>
+                                <keyMaterial>TestP@ssw0rd!</keyMaterial>
+                            </sharedKey>
+                        </security>
+                    </MSM>
+                </WiFiProfile>
+            </WiFiProfiles>
+        </component>
+    </settings>
+    <settings pass_="oobeSystem">
+        <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <OOBE>
+                <SkipMachineOOBE>true</SkipMachineOOBE>
+                <SkipUserOOBE>true</SkipUserOOBE>
+                <HideEULAPage>true</HideEULAPage>
+                <HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
+                <HideOnlineAccountScreens>true</HideOnlineAccountScreens>
+                <HideWirelessSetupInOOBE>false</HideWirelessSetupInOOBE>
+                <ProtectYourPC>3</ProtectYourPC>
+                <BypassNetworkCheck>true</BypassNetworkCheck>
+            </OOBE>
+            <UserAccounts>
+                <LocalAccounts>
+                    <LocalAccount>
+                        <Password>
+                            <Value>VABlAHMAdABQAEAAcwBzAHcAMAByAGQAMQAyADMAIQBQAGEAcwBzAHcAbwByAGQA</Value>
+                            <PlainText>false</PlainText>
+                        </Password>
+                        <Description>Test admin account</Description>
+                        <DisplayName>Test Administrator</DisplayName>
+                        <Group>Administrators</Group>
+                        <Name>testadmin</Name>
+                    </LocalAccount>
+                    <LocalAccount>
+                        <Password>
+                            <Value>VQBzAGUAcgBQAEAAcwBzAHcAMAByAGQANAA1ADYAIQBQAGEAcwBzAHcAbwByAGQA</Value>
+                            <PlainText>false</PlainText>
+                        </Password>
+                        <Description>Standard test user</Description>
+                        <DisplayName>Test User</DisplayName>
+                        <Group>Users</Group>
+                        <Name>testuser</Name>
+                    </LocalAccount>
+                </LocalAccounts>
+            </UserAccounts>
+            <FirstLogonCommands>
+                <SynchronousCommand>
+                    <Order>1</Order>
+                    <CommandLine>reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v HideFileExt /t REG_DWORD /d 0 /f</CommandLine>
+                    <Description>Show file extensions</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>2</Order>
+                    <CommandLine>reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Hidden /t REG_DWORD /d 1 /f</CommandLine>
+                    <Description>Show hidden files</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>3</Order>
+                    <CommandLine>reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v LaunchTo /t REG_DWORD /d 1 /f</CommandLine>
+                    <Description>Set Explorer launch to This PC</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>4</Order>
+                    <CommandLine>reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v TaskbarAl /t REG_DWORD /d 0 /f</CommandLine>
+                    <Description>Align taskbar to left</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>5</Order>
+                    <CommandLine>reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v TaskbarDa /t REG_DWORD /d 0 /f</CommandLine>
+                    <Description>Hide taskbar widgets</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>6</Order>
+                    <CommandLine>reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v TaskbarMn /t REG_DWORD /d 0 /f</CommandLine>
+                    <Description>Hide taskbar chat</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>7</Order>
+                    <CommandLine>reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f</CommandLine>
+                    <Description>Disable telemetry</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>8</Order>
+                    <CommandLine>reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Search" /v AllowCortana /t REG_DWORD /d 0 /f</CommandLine>
+                    <Description>Disable Cortana</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>9</Order>
+                    <CommandLine>reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Search" /v BingSearchEnabled /t REG_DWORD /d 0 /f</CommandLine>
+                    <Description>Disable web search</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>10</Order>
+                    <CommandLine>reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\GameDVR" /v AppCaptureEnabled /t REG_DWORD /d 0 /f</CommandLine>
+                    <Description>Disable Game Bar</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>11</Order>
+                    <CommandLine>dism /online /enable-feature /featurename:Microsoft-Hyper-V-All /all /norestart</CommandLine>
+                    <Description>Enable Hyper-V</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>12</Order>
+                    <CommandLine>dism /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart</CommandLine>
+                    <Description>Enable WSL</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>13</Order>
+                    <CommandLine>reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v EnableTransparency /t REG_DWORD /d 0 /f</CommandLine>
+                    <Description>Disable transparency effects</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>14</Order>
+                    <CommandLine>reg add "HKCU\Control Panel\Desktop\WindowMetrics" /v MinAnimate /t REG_SZ /d 0 /f</CommandLine>
+                    <Description>Disable animations</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>15</Order>
+                    <CommandLine>reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" /v {20D04FE0-3AEA-1069-A2D8-08002B30309D} /t REG_DWORD /d 0 /f</CommandLine>
+                    <Description>Show This PC on desktop</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>16</Order>
+                    <CommandLine>reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" /v {59031a47-3f72-44a7-89c5-5595fe6b30ee} /t REG_DWORD /d 0 /f</CommandLine>
+                    <Description>Show User Files on desktop</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>17</Order>
+                    <CommandLine>reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" /v {F02C1A0D-BE21-4350-88B0-7367FC96EF3C} /t REG_DWORD /d 0 /f</CommandLine>
+                    <Description>Show Network on desktop</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>18</Order>
+                    <CommandLine>reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" /v {645FF040-5081-101B-9F08-00AA002F954E} /t REG_DWORD /d 0 /f</CommandLine>
+                    <Description>Show Recycle Bin on desktop</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>19</Order>
+                    <CommandLine>reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" /v {5399E694-6CE5-4D6C-8FCE-1D8870FDCBA0} /t REG_DWORD /d 0 /f</CommandLine>
+                    <Description>Show Control Panel on desktop</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>20</Order>
+                    <CommandLine>reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors" /v DisableLocation /t REG_DWORD /d 1 /f</CommandLine>
+                    <Description>Disable location services</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>21</Order>
+                    <CommandLine>reg add "HKCU\Control Panel\Keyboard" /v InitialKeyboardIndicators /t REG_SZ /d 2 /f</CommandLine>
+                    <Description>Enable NumLock on startup</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>22</Order>
+                    <CommandLine>reg add "HKLM\SYSTEM\CurrentControlSet\Control\Keyboard Layout" /v "Scancode Map" /t REG_BINARY /d 00000000000000000200000000003A0000000000 /f</CommandLine>
+                    <Description>Disable CapsLock</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>23</Order>
+                    <CommandLine>reg add "HKCU\Control Panel\Accessibility\StickyKeys" /v Flags /t REG_SZ /d 506 /f</CommandLine>
+                    <Description>Disable sticky keys</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>24</Order>
+                    <CommandLine>reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v AppsUseLightTheme /t REG_DWORD /d 0 /f</CommandLine>
+                    <Description>Set dark theme for apps</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>25</Order>
+                    <CommandLine>reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v SystemUsesLightTheme /t REG_DWORD /d 0 /f</CommandLine>
+                    <Description>Set dark theme for system</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>26</Order>
+                    <CommandLine>reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v ColorPrevalence /t REG_DWORD /d 1 /f</CommandLine>
+                    <Description>Enable color on Start and Action Center</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>27</Order>
+                    <CommandLine>reg add "HKCU\Software\Microsoft\Windows\DWM" /v ColorPrevalence /t REG_DWORD /d 1 /f</CommandLine>
+                    <Description>Enable color on taskbar</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>28</Order>
+                    <CommandLine>powershell -Command "Get-AppxPackage *Microsoft.BingNews* | Remove-AppxPackage"</CommandLine>
+                    <Description>Remove Microsoft.BingNews</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>29</Order>
+                    <CommandLine>powershell -Command "Get-AppxPackage *Microsoft.BingWeather* | Remove-AppxPackage"</CommandLine>
+                    <Description>Remove Microsoft.BingWeather</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>30</Order>
+                    <CommandLine>powershell -Command "Get-AppxPackage *Microsoft.GetHelp* | Remove-AppxPackage"</CommandLine>
+                    <Description>Remove Microsoft.GetHelp</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>31</Order>
+                    <CommandLine>powershell -Command "Get-AppxPackage *Microsoft.Getstarted* | Remove-AppxPackage"</CommandLine>
+                    <Description>Remove Microsoft.Getstarted</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>32</Order>
+                    <CommandLine>powershell -Command "Get-AppxPackage *Microsoft.MicrosoftSolitaireCollection* | Remove-AppxPackage"</CommandLine>
+                    <Description>Remove Microsoft.MicrosoftSolitaireCollection</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>33</Order>
+                    <CommandLine>powershell -Command "Get-AppxPackage *Microsoft.People* | Remove-AppxPackage"</CommandLine>
+                    <Description>Remove Microsoft.People</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>34</Order>
+                    <CommandLine>powershell -Command "Get-AppxPackage *Microsoft.WindowsFeedbackHub* | Remove-AppxPackage"</CommandLine>
+                    <Description>Remove Microsoft.WindowsFeedbackHub</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>35</Order>
+                    <CommandLine>powershell -Command "Get-AppxPackage *Microsoft.YourPhone* | Remove-AppxPackage"</CommandLine>
+                    <Description>Remove Microsoft.YourPhone</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>36</Order>
+                    <CommandLine>powershell -Command "Get-AppxPackage *Microsoft.ZuneMusic* | Remove-AppxPackage"</CommandLine>
+                    <Description>Remove Microsoft.ZuneMusic</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>37</Order>
+                    <CommandLine>powershell -Command "Get-AppxPackage *Microsoft.ZuneVideo* | Remove-AppxPackage"</CommandLine>
+                    <Description>Remove Microsoft.ZuneVideo</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>38</Order>
+                    <CommandLine>powershell -Command "Get-AppxPackage *Microsoft.Xbox.TCUI* | Remove-AppxPackage"</CommandLine>
+                    <Description>Remove Microsoft.Xbox.TCUI</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>39</Order>
+                    <CommandLine>powershell -Command "Get-AppxPackage *Microsoft.XboxApp* | Remove-AppxPackage"</CommandLine>
+                    <Description>Remove Microsoft.XboxApp</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>40</Order>
+                    <CommandLine>powershell -Command "Get-AppxPackage *Microsoft.XboxGameOverlay* | Remove-AppxPackage"</CommandLine>
+                    <Description>Remove Microsoft.XboxGameOverlay</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>41</Order>
+                    <CommandLine>powershell -Command "Write-Host 'Test Script 1 Executed'"</CommandLine>
+                    <Description>Test PowerShell script</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>42</Order>
+                    <CommandLine>cmd /c echo Test Script 2 &gt; C:\test_log.txt</CommandLine>
+                    <Description>Test CMD script</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>43</Order>
+                    <CommandLine>powershell -Command "$PolicyPath = "$env:TEMP\WDACPolicy.xml"; New-CIPolicy -Level Publisher -FilePath $PolicyPath -UserPEs; Set-RuleOption -FilePath $PolicyPath -Option 8; Set-RuleOption -FilePath $PolicyPath -Option 9; ConvertFrom-CIPolicy -XmlFilePath $PolicyPath -BinaryFilePath $env:windir\System32\CodeIntegrity\SIPolicy.p7b"</CommandLine>
+                    <Description>Configure WDAC in Enforced mode</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand>
+                    <Order>44</Order>
+                    <CommandLine>reg add "HKLM\SYSTEM\CurrentControlSet\Control\DeviceGuard\Scenarios\HypervisorEnforcedCodeIntegrity" /v Enabled /t REG_DWORD /d 1 /f</CommandLine>
+                    <Description>Enable WDAC/HVCI</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+            </FirstLogonCommands>
+        </component>
+    </settings>
+</unattend>

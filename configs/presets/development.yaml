@@ -1,0 +1,291 @@
+# Windows 11 開発環境向けプリセット設定
+# Development preset configuration for Windows 11 unattended installation
+
+metadata:
+  name: "Development Preset"
+  description: "開発環境向けのWindows 11無人インストール設定"
+  version: "1.0.0"
+  author: "Windows 11 Sysprep応答ファイル生成システム"
+  target_environment: "development"
+  last_updated: "2024-01-01"
+
+# === 基本設定 ===
+general:
+  # コンピューター名
+  computer_name: "DEV-WIN11-01"
+  
+  # タイムゾーン設定
+  time_zone: "Tokyo Standard Time"
+  
+  # 地域設定
+  locale: "ja-JP"
+  
+  # キーボードレイアウト
+  keyboard_layout: "ja-JP"
+  input_language: "0411:00000411"
+  
+  # OEM情報設定
+  oem_information:
+    manufacturer: "Development Team"
+    model: "Developer Workstation"
+    support_hours: "24/7 (Development)"
+    support_phone: "Internal Help Desk"
+    support_url: "https://dev.internal.com/support"
+
+# === ユーザーアカウント設定 ===
+user_accounts:
+  # 管理者アカウント設定
+  administrator:
+    username: "DevAdmin"
+    password: "DevP@ssw0rd123!"
+    full_name: "Development Administrator"
+    description: "開発環境管理者アカウント"
+    enabled: true
+    auto_logon: false
+    password_expires: false
+    password_change_required: false
+    
+  # 開発者向けローカルアカウント
+  local_accounts:
+    - username: "Developer"
+      password: "Dev@123456"
+      full_name: "Developer User"
+      description: "開発作業用ユーザーアカウント"
+      group: "Administrators"  # 開発者には管理者権限を付与
+      enabled: true
+      password_expires: false
+
+# === ネットワーク設定 ===
+network:
+  # 開発環境はワークグループ使用
+  workgroup:
+    workgroup_name: "DEVTEAM"
+    
+  # ファイアウォール設定（開発向け）
+  firewall:
+    domain_profile: false     # 開発環境では制限を緩く
+    private_profile: true
+    public_profile: true
+    allow_ping: true
+    allow_file_sharing: true
+    allow_remote_desktop: true
+
+# === アプリケーション設定 ===
+applications:
+  # 開発ツールのインストール
+  install_packages:
+    - name: "Visual Studio Code"
+      source: "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64"
+      arguments: "/VERYSILENT /SUPPRESSMSGBOXES /MERGETASKS=!runcode"
+      description: "コードエディター"
+      
+    - name: "Git for Windows"
+      source: "https://github.com/git-for-windows/git/releases/latest/download/Git-2.43.0-64-bit.exe"
+      arguments: "/VERYSILENT /NORESTART"
+      description: "バージョン管理システム"
+      
+    - name: "Node.js LTS"
+      source: "https://nodejs.org/dist/v20.10.0/node-v20.10.0-x64.msi"
+      arguments: "/quiet /norestart"
+      description: "JavaScript実行環境"
+      
+    - name: "Docker Desktop"
+      source: "https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe"
+      arguments: "install --quiet"
+      description: "コンテナプラットフォーム"
+      
+    - name: "Python 3.11"
+      source: "https://www.python.org/ftp/python/3.11.0/python-3.11.0-amd64.exe"
+      arguments: "/quiet InstallAllUsers=1 PrependPath=1"
+      description: "Python プログラミング言語"
+
+  # 開発環境設定コマンド
+  run_commands:
+    - command: "reg add \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\AppModelUnlock\" /v AllowDevelopmentWithoutDevLicense /t REG_DWORD /d 1 /f"
+      description: "開発者モードを有効化"
+      order: 1
+      
+    - command: "powershell -Command \"Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Force\""
+      description: "PowerShell実行ポリシーをRemoteSignedに設定"
+      order: 2
+      
+    - command: "powershell -Command \"Add-MpPreference -ExclusionPath 'C:\\Development'\""
+      description: "開発フォルダーをWindows Defenderの除外に追加"
+      order: 3
+      
+    - command: "mkdir C:\\Development\\Projects"
+      description: "開発用フォルダーを作成"
+      order: 4
+      
+    - command: "reg add \"HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU\" /v NoAutoUpdate /t REG_DWORD /d 1 /f"
+      description: "Windows Update自動更新を無効化（開発環境用）"
+      order: 5
+
+# === Windows機能設定 ===
+windows_features:
+  # 開発に必要な機能を有効化
+  enable:
+    - "Microsoft-Windows-Subsystem-Linux"          # WSL
+    - "VirtualMachinePlatform"                      # 仮想マシンプラットフォーム
+    - "Microsoft-Hyper-V-All"                      # Hyper-V
+    - "Microsoft-Hyper-V-Management-Clients"       # Hyper-V管理ツール
+    - "IIS-WebServerRole"                          # IIS Webサーバー
+    - "IIS-HttpCompressionDynamic"
+    - "IIS-HttpCompressionStatic"
+    - "IIS-ManagementConsole"
+    - "IIS-ASPNET45"                               # ASP.NET 4.5
+    - "NetFx4-AdvSrvs"                             # .NET Framework 4詳細サービス
+    - "WCF-Services45"                             # WCF Services
+    - "TelnetClient"                               # Telnetクライアント
+    - "Microsoft-Windows-NetFx3-OnDemand-Features" # .NET Framework 3.5
+    - "Containers"                                 # Containers機能
+    - "Microsoft-Windows-Printing-Foundation"      # 印刷サービス
+    
+  # 不要な機能を無効化
+  disable:
+    - "WindowsMediaPlayer"
+    - "Internet-Explorer-Optional-amd64"
+    - "XPS-Foundation-Xps-Viewer"
+    - "FaxServicesClientPackage"
+
+# === レジストリ設定 ===
+registry:
+  keys:
+    # 開発者向けエクスプローラー設定
+    - path: "HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"
+      name: "Hidden"
+      value: "1"
+      type: "REG_DWORD"
+      action: "add"
+      description: "隠しファイルを表示"
+      
+    - path: "HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"
+      name: "HideFileExt"
+      value: "0"
+      type: "REG_DWORD"
+      action: "add"
+      description: "ファイル拡張子を表示"
+      
+    - path: "HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"
+      name: "ShowSuperHidden"
+      value: "1"
+      type: "REG_DWORD"
+      action: "add"
+      description: "システム保護されたファイルを表示"
+      
+    # 開発者モード設定
+    - path: "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\AppModelUnlock"
+      name: "AllowDevelopmentWithoutDevLicense"
+      value: "1"
+      type: "REG_DWORD"
+      action: "add"
+      description: "開発者モードを有効化"
+      
+    - path: "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\AppModelUnlock"
+      name: "AllowAllTrustedApps"
+      value: "1"
+      type: "REG_DWORD"
+      action: "add"
+      description: "すべての信頼されたアプリを許可"
+      
+    # パフォーマンス設定（開発作業に最適化）
+    - path: "HKLM\\SYSTEM\\CurrentControlSet\\Control\\PriorityControl"
+      name: "Win32PrioritySeparation"
+      value: "38"
+      type: "REG_DWORD"
+      action: "add"
+      description: "フォアグラウンドアプリケーションの優先度を高く設定"
+
+# === セキュリティ設定（開発環境向け） ===
+security:
+  # 開発環境用の緩いパスワードポリシー
+  password_policy:
+    minimum_length: 6
+    complexity_required: false
+    maximum_age: 365
+    minimum_age: 0
+    history_count: 3
+    lockout_threshold: 10
+    lockout_duration: 15
+    
+  # UAC設定（開発時の煩わしさを軽減）
+  uac:
+    enabled: true
+    admin_approval_mode: true
+    prompt_for_credentials: false  # 開発環境では資格情報要求を軽減
+    
+  # Windows Defender設定（開発フォルダー除外）
+  windows_defender:
+    real_time_protection: true
+    cloud_protection: false  # プライバシー考慮
+    sample_submission: false
+    exclusions:
+      - "C:\\Development"
+      - "C:\\temp"
+      - "C:\\Users\\Developer\\AppData\\Local\\Temp"
+
+# === システム最適化設定 ===
+optimization:
+  # 開発作業に最適化されたパフォーマンス設定
+  performance:
+    visual_effects: "best_performance"  # パフォーマンス重視
+    processor_scheduling: "programs"
+    memory_usage: "programs"
+    virtual_memory: "system_managed"
+    
+  # 開発に不要なサービスを無効化
+  services:
+    disable:
+      - "Fax"
+      - "HomeGroupListener"
+      - "HomeGroupProvider"
+      - "dmwappushservice"
+      - "MapsBroker"
+      - "RetailDemo"
+      - "XblAuthManager"
+      - "XblGameSave"
+      - "XboxNetApiSvc"
+      
+  # スタートアップ最適化
+  startup:
+    disable_startup_programs: true
+    fast_startup: true
+
+# === 監視・ログ設定 ===
+monitoring:
+  # 開発環境用ログ設定
+  event_logs:
+    application_max_size: "100MB"
+    system_max_size: "100MB"
+    security_max_size: "50MB"
+    retention: "overwrite_as_needed"
+    
+  # パフォーマンスモニタリング
+  performance_counters:
+    collect_cpu_usage: true
+    collect_memory_usage: true
+    collect_disk_usage: true
+    collect_network_usage: false  # 開発環境では不要
+
+# === 開発環境特有設定 ===
+development:
+  # コーディング環境設定
+  coding_environment:
+    enable_long_paths: true          # 長いパス名をサポート
+    enable_developer_mode: true      # 開発者モード有効化
+    install_windows_terminal: true   # Windows Terminalインストール
+    
+  # デバッグ設定
+  debugging:
+    enable_debug_privileges: true    # デバッグ権限を有効化
+    disable_error_reporting: true    # エラーレポート無効化（プライバシー）
+    enable_crash_dumps: true         # クラッシュダンプ有効化
+    
+  # 開発ツール統合
+  ide_integration:
+    vs_code_extensions:              # VS Code拡張機能（自動インストール用）
+      - "ms-python.python"
+      - "ms-vscode.vscode-json"
+      - "ms-vscode.powershell"
+      - "bradlc.vscode-tailwindcss"
+      - "esbenp.prettier-vscode"

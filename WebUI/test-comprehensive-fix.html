@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>包括的設定テスト - 修正版</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #0078d4;
+            padding-bottom: 10px;
+        }
+        button {
+            background-color: #0078d4;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin: 10px;
+        }
+        button:hover {
+            background-color: #106ebe;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 包括的設定テスト - 修正版</h1>
+    
+    <div>
+        <button onclick="testGenerateXML()">XMLのみ生成テスト</button>
+        <button onclick="testGenerateWithLog()">XML+ログ生成テスト</button>
+    </div>
+    
+    <div id="result"></div>
+
+    <script>
+        // 包括的な設定（全23項目）
+        const comprehensiveConfig = {
+            regionLanguage: {
+                displayLanguage: 'ja-JP',
+                inputLocale: '0411:00000411',
+                systemLocale: 'ja-JP',
+                userLocale: 'ja-JP',
+                uiLanguage: 'ja-JP',
+                uiLanguageFallback: 'en-US',
+                timezone: 'Tokyo Standard Time',
+                geoLocation: '122'
+            },
+            architecture: 'amd64',
+            setupBehavior: {
+                skipMachineOOBE: true,
+                skipUserOOBE: false,
+                hideEULAPage: true,
+                hideOEMRegistration: true,
+                hideOnlineAccountScreens: true,
+                hideWirelessSetup: false,
+                protectYourPC: 3,
+                networkLocation: 'Work',
+                skipDomainJoin: true
+            },
+            windowsEdition: {
+                edition: 'Pro',
+                productKey: 'VK7JG-NPHTM-C97JM-9MPGT-3V66T',
+                acceptEula: true,
+                installToAvailable: true,
+                willShowUI: 'OnError'
+            },
+            windowsPE: {
+                disableCommandPrompt: false,
+                disableFirewall: true,
+                enableNetwork: true,
+                enableRemoteAssistance: false,
+                pageFile: 'Auto',
+                scratchSpace: 512
+            },
+            diskConfig: {
+                wipeDisk: true,
+                diskId: 0,
+                partitionStyle: 'GPT',
+                partitions: [
+                    { type: 'EFI', size: 100 },
+                    { type: 'MSR', size: 16 },
+                    { type: 'Primary', size: 'remaining', letter: 'C' },
+                    { type: 'Recovery', size: 500 }
+                ]
+            },
+            computerSettings: {
+                computerName: 'WIN11-TEST',
+                organization: 'テスト組織',
+                owner: 'テストユーザー',
+                joinDomain: false,
+                domain: '',
+                domainOU: '',
+                workgroup: 'WORKGROUP'
+            },
+            userAccounts: {
+                accounts: [{
+                    name: 'admin',
+                    password: 'P@ssw0rd123!',
+                    displayName: '管理者',
+                    description: '管理者アカウント',
+                    group: 'Administrators',
+                    autoLogon: false,
+                    passwordNeverExpires: true
+                }],
+                autoLogonCount: 0,
+                disableAdminAccount: true,
+                enableGuestAccount: false
+            },
+            explorerSettings: {
+                showHiddenFiles: false,
+                showFileExtensions: true,
+                showProtectedOSFiles: false,
+                disableThumbnailCache: false,
+                disableThumbsDB: false,
+                launchTo: 'ThisPC',
+                navPaneExpand: true,
+                navPaneShowAll: false
+            },
+            startTaskbar: {
+                taskbarAlignment: 'Center',
+                taskbarSearch: 'Icon',
+                taskbarWidgets: false,
+                taskbarChat: false,
+                taskbarTaskView: true,
+                startMenuLayout: 'Default',
+                showRecentlyAdded: true,
+                showMostUsed: true,
+                showSuggestions: false
+            },
+            systemTweaks: {
+                disableUAC: false,
+                disableSmartScreen: false,
+                disableDefender: false,
+                disableFirewall: false,
+                disableUpdates: false,
+                disableTelemetry: true,
+                disableCortana: true,
+                disableSearchWeb: true,
+                disableGameBar: true,
+                fastStartup: false,
+                hibernation: false
+            },
+            visualEffects: {
+                performanceMode: 'Balanced',
+                transparency: true,
+                animations: true,
+                shadows: true,
+                smoothEdges: true,
+                fontSmoothing: 'ClearType',
+                wallpaperQuality: 'Fill'
+            },
+            desktopSettings: {
+                showComputer: true,
+                showUserFiles: true,
+                showNetwork: false,
+                showRecycleBin: true,
+                showControlPanel: false,
+                iconSize: 'Medium',
+                iconSpacing: 'Default',
+                autoArrange: false,
+                alignToGrid: true,
+                wallpaper: '',
+                solidColor: ''
+            },
+            vmSupport: {
+                enableHyperV: false,
+                enableWSL: false,
+                enableWSL2: false,
+                enableSandbox: false,
+                enableContainers: false,
+                enableVirtualization: true,
+                nestedVirtualization: false
+            },
+            wifiSettings: {
+                setup_mode: 'configure',
+                ssid: 'TestNetwork',
+                password: 'TestPassword123!',
+                authType: 'WPA2PSK',
+                encryption: 'AES',
+                connectAutomatically: true,
+                connectEvenNotBroadcasting: false
+            },
+            expressSettings: {
+                mode: 'all_disabled',
+                sendDiagnosticData: false,
+                improveInking: false,
+                tailoredExperiences: false,
+                advertisingId: false,
+                locationServices: false,
+                findMyDevice: false
+            },
+            lockKeys: {
+                numLock: true,
+                capsLock: false,
+                scrollLock: false
+            },
+            stickyKeys: {
+                enabled: false,
+                lockModifier: false,
+                turnOffOnTwoKeys: true,
+                feedback: false,
+                beep: false
+            },
+            personalization: {
+                theme: 'Light',
+                accentColor: '0078D4',
+                startColor: true,
+                taskbarColor: true,
+                titleBarColor: true,
+                lockScreenImage: '',
+                userPicture: '',
+                soundsScheme: 'Windows Default',
+                mouseCursorScheme: 'Windows Default'
+            },
+            removeApps: {
+                apps: [
+                    'Microsoft.BingNews',
+                    'Microsoft.BingWeather',
+                    'Microsoft.GetHelp',
+                    'Microsoft.Getstarted'
+                ]
+            },
+            customScripts: {
+                firstLogon: [],
+                setupScripts: []
+            },
+            wdac: {
+                enabled: false,
+                policyMode: 'Audit',
+                allowMicrosoftApps: true,
+                allowStoreApps: true,
+                allowReputableApps: false,
+                customRules: []
+            },
+            additionalComponents: {
+                dotnet35: false,
+                dotnet48: true,
+                iis: false,
+                telnetClient: false,
+                tftpClient: false,
+                smb1: false,
+                powershell2: false,
+                directPlay: false,
+                printToPDF: true,
+                xpsViewer: false,
+                mediaFeatures: true,
+                workFolders: false
+            }
+        };
+
+        function displayResult(message, type = 'info') {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = `result ${type}`;
+            resultDiv.innerHTML = message;
+        }
+
+        async function testGenerateXML() {
+            displayResult('🔄 XML生成中...', 'info');
+            
+            try {
+                const response = await fetch('http://192.168.3.92:8081/api/generate-unattend', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(comprehensiveConfig)
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+
+                const xml = await response.text();
+                displayResult(`
+                    <h3>✅ XML生成成功！</h3>
+                    <p>サイズ: ${xml.length} バイト</p>
+                    <details>
+                        <summary>XMLプレビュー（最初の1000文字）</summary>
+                        <pre>${xml.substring(0, 1000)}...</pre>
+                    </details>
+                `, 'success');
+            } catch (error) {
+                displayResult(`
+                    <h3>❌ エラーが発生しました</h3>
+                    <p>${error.message}</p>
+                `, 'error');
+            }
+        }
+
+        async function testGenerateWithLog() {
+            displayResult('🔄 XML+ログ生成中...', 'info');
+            
+            try {
+                const response = await fetch('http://192.168.3.92:8081/api/generate-with-log', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(comprehensiveConfig)
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'unattend_package.zip';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                
+                displayResult(`
+                    <h3>✅ ZIP生成成功！</h3>
+                    <p>サイズ: ${blob.size} バイト</p>
+                    <p>ダウンロードが開始されました。</p>
+                `, 'success');
+            } catch (error) {
+                displayResult(`
+                    <h3>❌ エラーが発生しました</h3>
+                    <p>${error.message}</p>
+                `, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

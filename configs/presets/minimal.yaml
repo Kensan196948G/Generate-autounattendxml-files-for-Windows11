@@ -1,0 +1,126 @@
+# Windows 11 最小構成プリセット設定
+# Minimal preset configuration for Windows 11 unattended installation
+
+metadata:
+  name: "Minimal Preset"
+  description: "最小限の設定でのWindows 11無人インストール設定"
+  version: "1.0.0"
+  author: "Windows 11 Sysprep応答ファイル生成システム"
+  target_environment: "minimal"
+  last_updated: "2024-01-01"
+
+# === 基本設定（必須項目のみ） ===
+general:
+  # コンピューター名
+  computer_name: "WIN11-PC"
+  
+  # タイムゾーン設定
+  time_zone: "Tokyo Standard Time"
+  
+  # 地域設定
+  locale: "ja-JP"
+  
+  # キーボードレイアウト
+  keyboard_layout: "ja-JP"
+
+# === ユーザーアカウント設定 ===
+user_accounts:
+  # 管理者アカウント設定（最小限）
+  administrator:
+    username: "Admin"
+    password: "Password123!"  # 注意: 実環境では必ず変更してください
+    enabled: true
+    auto_logon: false
+
+# === ネットワーク設定 ===
+network:
+  # ワークグループ設定（シンプルな環境用）
+  workgroup:
+    workgroup_name: "WORKGROUP"
+
+# === アプリケーション設定 ===
+applications:
+  # 基本的なコマンドのみ実行
+  run_commands:
+    - command: "reg add \"HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\" /v AutoAdminLogon /t REG_SZ /d 0 /f"
+      description: "自動ログオンを無効化"
+      order: 1
+    
+    - command: "reg add \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\" /v EnableLUA /t REG_DWORD /d 1 /f"
+      description: "User Account Control (UAC)を有効化"
+      order: 2
+
+# === Windows機能設定 ===
+windows_features:
+  # 必要最小限の機能のみ有効
+  enable:
+    - "NetFx3"  # .NET Framework 3.5（一部アプリで必要）
+  
+  # 不要な機能を無効化してスペース節約
+  disable:
+    - "WindowsMediaPlayer"
+    - "Internet-Explorer-Optional-amd64"
+    - "MediaPlayback"
+    - "XPS-Foundation-Xps-Viewer"
+    - "Printing-XPSServices-Features"
+
+# === レジストリ設定（最小限） ===
+registry:
+  keys:
+    # セキュリティの基本設定
+    - path: "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System"
+      name: "EnableLUA"
+      value: "1"
+      type: "REG_DWORD"
+      action: "add"
+      description: "User Account Control (UAC)を有効化"
+    
+    # パフォーマンス向上のための基本設定
+    - path: "HKLM\\SYSTEM\\CurrentControlSet\\Control\\PriorityControl"
+      name: "Win32PrioritySeparation"
+      value: "38"
+      type: "REG_DWORD"
+      action: "add"
+      description: "プロセス優先度設定を調整"
+
+# === セキュリティ設定（基本のみ） ===
+security:
+  # 基本的なパスワードポリシー
+  password_policy:
+    minimum_length: 6
+    complexity_required: false
+    maximum_age: 365
+  
+  # UAC設定
+  uac:
+    enabled: true
+    admin_approval_mode: true
+
+# === システム最適化設定 ===
+optimization:
+  # パフォーマンス設定（軽量化重視）
+  performance:
+    visual_effects: "best_performance"
+    processor_scheduling: "programs"
+    
+  # 不要なサービスを無効化
+  services:
+    disable:
+      - "Fax"
+      - "HomeGroupListener"
+      - "HomeGroupProvider"
+      - "dmwappushservice"  # WAP Push Message Routing Service
+      
+  # スタートアップ最適化
+  startup:
+    disable_startup_programs: true
+    fast_startup: true  # 高速スタートアップを有効
+
+# === 監視・ログ設定（最小限） ===
+monitoring:
+  # イベントログサイズを最小に
+  event_logs:
+    application_max_size: "20MB"
+    system_max_size: "20MB"
+    security_max_size: "20MB"
+    retention: "overwrite_as_needed"
