@@ -1,0 +1,31 @@
+{
+  "name": "windows11-unattend-generator",
+  "version": "2.0.0",
+  "description": "Windows 11 無人応答ファイル生成システム - WebUI",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3050 -H 0.0.0.0",
+    "build": "next build",
+    "start": "next start -p 3050 -H 0.0.0.0",
+    "lint": "next lint",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug"
+  },
+  "dependencies": {
+    "axios": "^1.11.0",
+    "next": "^14.2.20",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-hot-toast": "^2.6.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^14.2.20",
+    "typescript": "^5.7.2"
+  }
+}
